@@ -462,29 +462,6 @@
     <!-- BASIC -->
     <div class="form-section active" id="tab-basic">
       <div class="section-heading">Personal Info</div>
-
-      <!-- AI BOX -->
-      <div style="background:linear-gradient(135deg,#1A1A2E,#2D1B4E);border-radius:12px;padding:18px;margin-bottom:20px;border:1px solid rgba(200,16,46,0.3)">
-        <div style="font-size:0.8rem;font-weight:700;color:#FF80C8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">✨ AI Summary Generator</div>
-        <div class="form-row" style="margin-bottom:10px">
-          <label style="color:rgba(255,255,255,0.6)">Job Role / Position applying for *</label>
-          <input type="text" id="f-jobrole" placeholder="e.g. Software Engineer, Bank Manager, Teacher..." style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:white;" oninput="update()"/>
-        </div>
-        <div class="form-row" style="margin-bottom:12px">
-          <label style="color:rgba(255,255,255,0.6)">Years of Experience</label>
-          <select id="f-experience" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:white;">
-            <option value="fresher">Fresher (0 years)</option>
-            <option value="1-2">1-2 Years</option>
-            <option value="3-5">3-5 Years</option>
-            <option value="5+">5+ Years</option>
-          </select>
-        </div>
-        <button onclick="generateAISummary()" id="ai-btn" style="width:100%;padding:11px;background:linear-gradient(135deg,#C8102E,#E91E8C);color:white;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;font-family:'Source Sans 3',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <span id="ai-btn-text">✨ Generate AI Summary & Description</span>
-        </button>
-        <div id="ai-status" style="font-size:0.78rem;color:rgba(255,255,255,0.4);text-align:center;margin-top:8px;display:none"></div>
-      </div>
-
       <div class="form-row"><label>Full Name *</label><input type="text" id="f-name" placeholder="Rahul Kumar Sharma" oninput="update()"/></div>
       <div class="form-row"><label>Job Title / Designation</label><input type="text" id="f-title" placeholder="Software Engineer / MBA Graduate" oninput="update()"/></div>
       <div class="form-grid-2">
@@ -496,10 +473,14 @@
         <div class="form-row"><label>State</label><input type="text" id="f-state" placeholder="Maharashtra" oninput="update()"/></div>
       </div>
       <div class="form-row"><label>LinkedIn (optional)</label><input type="text" id="f-linkedin" placeholder="linkedin.com/in/rahulkumar" oninput="update()"/></div>
-      <div class="form-row"><label>Objective / Summary</label><textarea id="f-summary" placeholder="Click 'Generate AI Summary' above to auto-fill this..." oninput="update()"></textarea></div>
+      <div class="form-row">
+        <label>Objective / Summary</label>
+        <textarea id="f-summary" placeholder="e.g. Motivated Software Engineer with 2 years of experience. Skilled in JavaScript and React. Seeking a challenging role to apply my skills." oninput="update()"></textarea>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:5px;">💡 Tip: 3-4 lines mein likho — apna role, skills aur goal mention karo.</div>
+      </div>
     </div>
 
-    <!-- EDUCATION -->
+        <!-- EDUCATION -->
     <div class="form-section" id="tab-education">
       <div class="section-heading">Education</div>
       <div id="edu-entries"></div>
@@ -725,69 +706,6 @@ window.removeLang = function removeLang(l) {
 function renderLangTags() {
   const wrap = document.getElementById('langs-wrap');
   wrap.innerHTML = langs.map(l => `<span class="skill-tag">${l}<button onclick="removeLang('${l}')">✕</button></span>`).join('');
-}
-
-// ── AI SUMMARY GENERATOR ──────────────────────────────────────
-window.generateAISummary = async function generateAISummary() {
-  const jobRole = v('f-jobrole');
-  if (!jobRole) { showToast('⚠️ Pehle job role likho!'); return; }
-
-  const name = v('f-name') || 'the candidate';
-  const exp = document.getElementById('f-experience').value;
-  const skills_list = skills.length ? skills.join(', ') : '';
-
-  const btn = document.getElementById('ai-btn');
-  const btnText = document.getElementById('ai-btn-text');
-  const status = document.getElementById('ai-status');
-
-  btn.disabled = true;
-  btnText.textContent = '⏳ Generating...';
-  status.style.display = 'block';
-  status.textContent = 'AI likh raha hai summary...';
-
-  const expText = exp === 'fresher' ? 'a fresher with no prior experience' :
-    exp === '1-2' ? '1-2 years of experience' :
-    exp === '3-5' ? '3-5 years of experience' : '5+ years of experience';
-
-  const prompt = `Write a professional resume objective/summary for an Indian job seeker applying for the role of "${jobRole}". They are ${expText}.${skills_list ? ` Their key skills are: ${skills_list}.` : ''} 
-
-Write ONLY the summary paragraph (3-4 sentences). Make it professional, specific to the job role, and suitable for Indian job market. Do not include any heading or label. Just the paragraph text.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    const data = await res.json();
-    const summary = data.content?.[0]?.text?.trim();
-
-    if (summary) {
-      document.getElementById('f-summary').value = summary;
-      // Also auto-fill job title if empty
-      if (!v('f-title')) {
-        document.getElementById('f-title').value = jobRole;
-      }
-      update();
-      showToast('✅ AI Summary ready!');
-      status.textContent = '✅ Summary generated! Aap edit bhi kar sakte ho.';
-      status.style.color = '#4ECDA4';
-    } else {
-      throw new Error('Empty response');
-    }
-  } catch(e) {
-    showToast('❌ Error! Dobara try karo.');
-    status.textContent = '❌ Kuch error aaya. Dobara try karo.';
-    status.style.color = '#FF6B6B';
-  } finally {
-    btn.disabled = false;
-    btnText.textContent = '✨ Generate AI Summary & Description';
-  }
 }
 
 // ── UPDATE RESUME ─────────────────────────────────────────────
