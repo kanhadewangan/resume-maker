@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Resume Maker India – No Login Required</title>
+  <meta name="description" content="Create a professional resume/CV online for free. No login, no signup. Download as PDF instantly. Best free resume maker for Indian students and job seekers."/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --ink: #1A1A2E;
+      --ink-soft: #3D3D5C;
+      --muted: #7A7A9A;
+      --border: #E2E2EE;
+      --bg: #F5F5FA;
+      --white: #FFFFFF;
+      --accent: #C8102E;
+      --accent-light: #FFF0F2;
+      --gold: #B8860B;
+      --success: #1A6B3C;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--ink);
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    }
+    .header-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+    .logo small { display: block; font-family: 'Source Sans 3', sans-serif; font-size: 0.72rem; font-weight: 400; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
+    .header-actions { display: flex; gap: 10px; }
+    .btn {
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #a50d26; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(200,16,46,0.4); }
+    .btn-outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.3); }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.08); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #155a33; transform: translateY(-1px); }
+
+    /* ── LAYOUT ── */
+    .app-layout {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ── FORM PANEL ── */
+    .form-panel {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.07);
+      overflow: hidden;
+      position: sticky;
+      top: 80px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+    .form-panel::-webkit-scrollbar { width: 4px; }
+    .form-panel::-webkit-scrollbar-track { background: transparent; }
+    .form-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    .section-tab {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: white; }
+    .tab-btn:hover:not(.active) { color: var(--ink); }
+
+    .form-section { display: none; padding: 24px; }
+    .form-section.active { display: block; }
+
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .form-row { margin-bottom: 16px; }
+    .form-row label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-row input,
+    .form-row textarea,
+    .form-row select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Source Sans 3', sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-row input:focus,
+    .form-row textarea:focus,
+    .form-row select:focus { border-color: var(--accent); }
+    .form-row textarea { resize: vertical; min-height: 80px; }
+
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .add-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 8px;
+    }
+    .add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    .entry-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+      background: var(--bg);
+    }
+    .entry-card .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .entry-card .remove-btn:hover { background: #FFE5E5; color: var(--accent); }
+
+    .skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .skill-tag {
+      background: var(--ink);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .skill-tag button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+    }
+    .skill-tag button:hover { color: white; }
+    .skill-input-row { display: flex; gap: 8px; }
+    .skill-input-row input { flex: 1; }
+    .skill-input-row button {
+      padding: 10px 16px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ── PREVIEW PANEL ── */
+    .preview-panel { }
+    .preview-toolbar {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .preview-toolbar span { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+    .preview-toolbar strong { color: var(--ink); }
+
+    /* ── RESUME ── */
+    #resume-output {
+      background: white;
+      width: 100%;
+      min-height: 297mm;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .resume-wrap {
+      padding: 0;
+      font-family: 'Source Sans 3', sans-serif;
+      color: #1A1A2E;
+    }
+
+    /* Resume Header */
+    .r-header {
+      background: var(--ink);
+      color: white;
+      padding: 36px 44px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .r-header::before {
+      content: '';
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(200,16,46,0.15);
+    }
+    .r-header::after {
+      content: '';
+      position: absolute;
+      right: 60px;
+      bottom: -30px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .r-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .r-designation {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .r-contact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      position: relative;
+    }
+    .r-contact-item {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .r-contact-item .icon { font-size: 0.9rem; }
+
+    /* Resume Body */
+    .r-body { display: grid; grid-template-columns: 1fr 280px; }
+
+    .r-main { padding: 32px 36px; border-right: 1px solid var(--border); }
+    .r-side { padding: 32px 28px; background: #FAFAFA; }
+
+    .r-section { margin-bottom: 28px; }
+    .r-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    .r-entry { margin-bottom: 18px; }
+    .r-entry-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 3px; }
+    .r-entry-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+    .r-entry-date { font-size: 0.75rem; color: var(--muted); white-space: nowrap; font-weight: 500; background: var(--bg); padding: 2px 8px; border-radius: 4px; }
+    .r-entry-sub { font-size: 0.82rem; color: var(--ink-soft); font-weight: 500; margin-bottom: 5px; }
+    .r-entry-desc { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.55; }
+
+    /* Education grid */
+    .r-edu-grid { display: grid; gap: 12px; }
+    .r-edu-card {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px 16px;
+      border-left: 3px solid var(--accent);
+    }
+    .r-edu-degree { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+    .r-edu-school { font-size: 0.8rem; color: var(--ink-soft); margin: 2px 0; }
+    .r-edu-meta { display: flex; gap: 12px; font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+    .r-edu-marks { font-weight: 600; color: var(--success); }
+
+    /* Skills */
+    .r-skill-list { display: flex; flex-direction: column; gap: 8px; }
+    .r-skill-item { }
+    .r-skill-name { font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .r-skill-bar { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .r-skill-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); border-radius: 99px; }
+
+    .r-tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .r-tag {
+      background: var(--ink);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .r-side .r-section-title { font-size: 0.85rem; }
+
+    .r-lang-list { display: flex; flex-direction: column; gap: 8px; }
+    .r-lang-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
+    .r-lang-name { font-weight: 600; color: var(--ink); }
+    .r-lang-level { color: var(--muted); font-size: 0.75rem; }
+
+    .r-empty { color: var(--muted); font-size: 0.82rem; font-style: italic; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--ink); color: white;
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 0.88rem; font-weight: 600;
+      opacity: 0; transform: translateY(16px);
+      transition: all 0.25s; z-index: 999;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media(max-width: 960px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .form-panel { position: static; max-height: none; }
+      .r-body { grid-template-columns: 1fr; }
+      .r-side { border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      Resume<span>Craft</span>
+      <small>Free Resume Maker · No Login Required</small>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="clearAll()">🔄 Reset</button>
+      <button class="btn btn-primary" onclick="downloadPDF()">⬇️ Download PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+    <div class="section-tab">
+      <button class="tab-btn active" onclick="showTab('basic')">👤 Basic</button>
+      <button class="tab-btn" onclick="showTab('education')">🎓 Education</button>
+      <button class="tab-btn" onclick="showTab('experience')">💼 Experience</button>
+      <button class="tab-btn" onclick="showTab('skills')">⚡ Skills</button>
+    </div>
+
+    <!-- BASIC -->
+    <div class="form-section active" id="tab-basic">
+      <div class="section-heading">Personal Info</div>
+      <div class="form-row"><label>Full Name *</label><input type="text" id="f-name" placeholder="Rahul Kumar Sharma" oninput="update()"/></div>
+      <div class="form-row"><label>Job Title / Designation</label><input type="text" id="f-title" placeholder="Software Engineer / MBA Graduate" oninput="update()"/></div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>Phone *</label><input type="text" id="f-phone" placeholder="+91 98765 43210" oninput="update()"/></div>
+        <div class="form-row"><label>Email *</label><input type="text" id="f-email" placeholder="rahul@gmail.com" oninput="update()"/></div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>City</label><input type="text" id="f-city" placeholder="Mumbai" oninput="update()"/></div>
+        <div class="form-row"><label>State</label><input type="text" id="f-state" placeholder="Maharashtra" oninput="update()"/></div>
+      </div>
+      <div class="form-row"><label>LinkedIn (optional)</label><input type="text" id="f-linkedin" placeholder="linkedin.com/in/rahulkumar" oninput="update()"/></div>
+      <div class="form-row"><label>Objective / Summary</label><textarea id="f-summary" placeholder="Motivated and detail-oriented software engineer with 2+ years of experience..." oninput="update()"></textarea></div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="form-section" id="tab-education">
+      <div class="section-heading">Education</div>
+      <div id="edu-entries"></div>
+      <button class="add-btn" onclick="addEdu()">+ Add Education</button>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div class="form-section" id="tab-experience">
+      <div class="section-heading">Work Experience</div>
+      <div id="exp-entries"></div>
+      <button class="add-btn" onclick="addExp()">+ Add Experience</button>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="form-section" id="tab-skills">
+      <div class="section-heading">Skills & Languages</div>
+      <div class="form-row">
+        <label>Technical / Core Skills</label>
+        <div class="skill-input-row">
+          <input type="text" id="skill-input" placeholder="e.g. JavaScript, MS Excel..." onkeydown="if(event.key==='Enter')addSkill()"/>
+          <button onclick="addSkill()">Add</button>
+        </div>
+        <div class="skills-wrap" id="skills-wrap"></div>
+      </div>
+      <div class="form-row">
+        <label>Languages Known</label>
+        <div class="skill-input-row">
+          <input type="text" id="lang-input" placeholder="e.g. Hindi, English..." onkeydown="if(event.key==='Enter')addLang()"/>
+          <button onclick="addLang()">Add</button>
+        </div>
+        <div class="skills-wrap" id="langs-wrap"></div>
+      </div>
+      <div class="form-row">
+        <label>Hobbies / Interests (optional)</label>
+        <input type="text" id="f-hobbies" placeholder="Reading, Cricket, Photography" oninput="update()"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="preview-toolbar">
+      <span>📄 Live Preview — <strong>A4 Format</strong></span>
+      <button class="btn btn-success" onclick="downloadPDF()">⬇️ Download PDF Free</button>
+    </div>
+    <div id="resume-output">
+      <div class="resume-wrap">
+
+        <!-- RESUME HEADER -->
+        <div class="r-header">
+          <div class="r-name" id="r-name">Your Name</div>
+          <div class="r-designation" id="r-designation">Job Title / Designation</div>
+          <div class="r-contact-row">
+            <div class="r-contact-item" id="r-phone"><span class="icon">📞</span> +91 XXXXX XXXXX</div>
+            <div class="r-contact-item" id="r-email"><span class="icon">✉️</span> email@gmail.com</div>
+            <div class="r-contact-item" id="r-location"><span class="icon">📍</span> City, State</div>
+            <div class="r-contact-item" id="r-linkedin" style="display:none"><span class="icon">🔗</span> <span id="r-li-text"></span></div>
+          </div>
+        </div>
+
+        <!-- RESUME BODY -->
+        <div class="r-body">
+          <div class="r-main">
+
+            <!-- SUMMARY -->
+            <div class="r-section" id="r-summary-section">
+              <div class="r-section-title">Objective</div>
+              <div class="r-entry-desc" id="r-summary">Motivated professional seeking a challenging role to apply skills and contribute to organizational growth.</div>
+            </div>
+
+            <!-- EXPERIENCE -->
+            <div class="r-section" id="r-exp-section">
+              <div class="r-section-title">Work Experience</div>
+              <div id="r-exp-list"><p class="r-empty">Add your work experience →</p></div>
+            </div>
+
+            <!-- EDUCATION -->
+            <div class="r-section">
+              <div class="r-section-title">Education</div>
+              <div class="r-edu-grid" id="r-edu-list"><p class="r-empty">Add your education →</p></div>
+            </div>
+
+          </div>
+          <div class="r-side">
+
+            <!-- SKILLS -->
+            <div class="r-section">
+              <div class="r-section-title">Skills</div>
+              <div id="r-skills-list"><p class="r-empty">Add your skills →</p></div>
+            </div>
+
+            <!-- LANGUAGES -->
+            <div class="r-section">
+              <div class="r-section-title">Languages</div>
+              <div id="r-langs-list"><p class="r-empty">Add languages →</p></div>
+            </div>
+
+            <!-- HOBBIES -->
+            <div class="r-section" id="r-hobbies-section" style="display:none">
+              <div class="r-section-title">Interests</div>
+              <div id="r-hobbies-list"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────
+let skills = [];
+let langs = [];
+let eduCount = 0;
+let expCount = 0;
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── EDUCATION ────────────────────────────────────────────────
+function addEdu() {
+  const id = ++eduCount;
+  const wrap = document.getElementById('edu-entries');
+  const div = document.createElement('div');
+  div.className = 'entry-card';
+  div.id = 'edu-' + id;
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeEntry('edu-${id}')">✕</button>
+    <div class="form-row"><label>Degree / Class</label>
+      <select oninput="update()">
+        <option value="">Select...</option>
+        <option>Class 10th (SSC/CBSE/ICSE)</option>
+        <option>Class 12th (HSC/CBSE/ISC)</option>
+        <option>Bachelor's Degree (B.Tech/BA/B.Com/BSc)</option>
+        <option>Master's Degree (MBA/M.Tech/MA/MSc)</option>
+        <option>Diploma</option>
+        <option>PhD</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-row"><label>School / College / University</label><input type="text" placeholder="Delhi Public School / IIT Delhi" oninput="update()"/></div>
+    <div class="form-grid-2">
+      <div class="form-row"><label>Year of Passing</label><input type="text" placeholder="2022" oninput="update()"/></div>
+      <div class="form-row"><label>Marks / CGPA / %</label><input type="text" placeholder="85% / 8.5 CGPA" oninput="update()"/></div>
+    </div>
+  `;
+  wrap.appendChild(div);
+  update();
+}
+
+function addExp() {
+  const id = ++expCount;
+  const wrap = document.getElementById('exp-entries');
+  const div = document.createElement('div');
+  div.className = 'entry-card';
+  div.id = 'exp-' + id;
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeEntry('exp-${id}')">✕</button>
+    <div class="form-row"><label>Job Title</label><input type="text" placeholder="Software Engineer" oninput="update()"/></div>
+    <div class="form-row"><label>Company Name</label><input type="text" placeholder="TCS / Infosys / Startup" oninput="update()"/></div>
+    <div class="form-grid-2">
+      <div class="form-row"><label>From</label><input type="text" placeholder="Jan 2022" oninput="update()"/></div>
+      <div class="form-row"><label>To</label><input type="text" placeholder="Present" oninput="update()"/></div>
+    </div>
+    <div class="form-row"><label>Key Responsibilities</label><textarea placeholder="• Developed REST APIs using Node.js&#10;• Reduced load time by 30%&#10;• Worked in Agile team of 8" oninput="update()"></textarea></div>
+  `;
+  wrap.appendChild(div);
+  update();
+}
+
+function removeEntry(id) {
+  document.getElementById(id)?.remove();
+  update();
+}
+
+// ── SKILLS ────────────────────────────────────────────────────
+function addSkill() {
+  const inp = document.getElementById('skill-input');
+  const val = inp.value.trim();
+  if (!val || skills.includes(val)) return;
+  skills.push(val);
+  inp.value = '';
+  renderSkillTags();
+  update();
+}
+
+function removeSkill(s) {
+  skills = skills.filter(x => x !== s);
+  renderSkillTags();
+  update();
+}
+
+function renderSkillTags() {
+  const wrap = document.getElementById('skills-wrap');
+  wrap.innerHTML = skills.map(s => `<span class="skill-tag">${s}<button onclick="removeSkill('${s}')">✕</button></span>`).join('');
+}
+
+function addLang() {
+  const inp = document.getElementById('lang-input');
+  const val = inp.value.trim();
+  if (!val || langs.includes(val)) return;
+  langs.push(val);
+  inp.value = '';
+  renderLangTags();
+  update();
+}
+
+function removeLang(l) {
+  langs = langs.filter(x => x !== l);
+  renderLangTags();
+  update();
+}
+
+function renderLangTags() {
+  const wrap = document.getElementById('langs-wrap');
+  wrap.innerHTML = langs.map(l => `<span class="skill-tag">${l}<button onclick="removeLang('${l}')">✕</button></span>`).join('');
+}
+
+// ── UPDATE RESUME ─────────────────────────────────────────────
+function update() {
+  const name = v('f-name') || 'Your Name';
+  const title = v('f-title') || 'Job Title / Designation';
+  const phone = v('f-phone') || '+91 XXXXX XXXXX';
+  const email = v('f-email') || 'email@gmail.com';
+  const city = v('f-city');
+  const state = v('f-state');
+  const linkedin = v('f-linkedin');
+  const summary = v('f-summary');
+  const hobbies = v('f-hobbies');
+
+  t('r-name', name);
+  t('r-designation', title);
+  t('r-phone', '📞 ' + phone);
+  t('r-email', '✉️ ' + email);
+  t('r-location', '📍 ' + [city, state].filter(Boolean).join(', ') || 'City, State');
+
+  if (linkedin) {
+    document.getElementById('r-linkedin').style.display = 'flex';
+    t('r-li-text', linkedin);
+  } else {
+    document.getElementById('r-linkedin').style.display = 'none';
+  }
+
+  t('r-summary', summary || 'Motivated professional seeking a challenging role to apply skills and contribute to organizational growth.');
+
+  // Education
+  const eduCards = document.querySelectorAll('[id^="edu-"]');
+  const eduList = document.getElementById('r-edu-list');
+  if (eduCards.length === 0) {
+    eduList.innerHTML = '<p class="r-empty">Add your education →</p>';
+  } else {
+    eduList.innerHTML = Array.from(eduCards).map(card => {
+      const inputs = card.querySelectorAll('input, select');
+      const degree = inputs[0]?.value || '—';
+      const school = inputs[1]?.value || '—';
+      const year = inputs[2]?.value || '';
+      const marks = inputs[3]?.value || '';
+      return `<div class="r-edu-card">
+        <div class="r-edu-degree">${degree}</div>
+        <div class="r-edu-school">${school}</div>
+        <div class="r-edu-meta">
+          ${year ? `<span>${year}</span>` : ''}
+          ${marks ? `<span class="r-edu-marks">${marks}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Experience
+  const expCards = document.querySelectorAll('[id^="exp-"]');
+  const expList = document.getElementById('r-exp-list');
+  if (expCards.length === 0) {
+    expList.innerHTML = '<p class="r-empty">Add your work experience →</p>';
+  } else {
+    expList.innerHTML = Array.from(expCards).map(card => {
+      const inputs = card.querySelectorAll('input, textarea');
+      const role = inputs[0]?.value || '—';
+      const company = inputs[1]?.value || '—';
+      const from = inputs[2]?.value || '';
+      const to = inputs[3]?.value || '';
+      const desc = inputs[4]?.value || '';
+      const period = [from, to].filter(Boolean).join(' – ');
+      return `<div class="r-entry">
+        <div class="r-entry-header">
+          <div class="r-entry-title">${role}</div>
+          ${period ? `<div class="r-entry-date">${period}</div>` : ''}
+        </div>
+        <div class="r-entry-sub">${company}</div>
+        ${desc ? `<div class="r-entry-desc" style="white-space:pre-line">${desc}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // Skills
+  const skillsList = document.getElementById('r-skills-list');
+  if (skills.length === 0) {
+    skillsList.innerHTML = '<p class="r-empty">Add your skills →</p>';
+  } else {
+    skillsList.innerHTML = `<div class="r-tag-list">${skills.map(s => `<span class="r-tag">${s}</span>`).join('')}</div>`;
+  }
+
+  // Languages
+  const langsList = document.getElementById('r-langs-list');
+  if (langs.length === 0) {
+    langsList.innerHTML = '<p class="r-empty">Add languages →</p>';
+  } else {
+    langsList.innerHTML = `<div class="r-lang-list">${langs.map(l => `<div class="r-lang-item"><span class="r-lang-name">${l}</span></div>`).join('')}</div>`;
+  }
+
+  // Hobbies
+  if (hobbies) {
+    document.getElementById('r-hobbies-section').style.display = 'block';
+    document.getElementById('r-hobbies-list').innerHTML = `<div class="r-tag-list">${hobbies.split(',').map(h => h.trim()).filter(Boolean).map(h => `<span class="r-tag">${h}</span>`).join('')}</div>`;
+  } else {
+    document.getElementById('r-hobbies-section').style.display = 'none';
+  }
+}
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function t(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
+
+// ── PDF DOWNLOAD ──────────────────────────────────────────────
+function downloadPDF() {
+  const name = v('f-name') || 'Resume';
+  const el = document.getElementById('resume-output');
+  const opt = {
+    margin: 0,
+    filename: name.replace(/ /g,'_') + '_Resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  showToast('Generating PDF...');
+  html2pdf().set(opt).from(el).save().then(() => showToast('✅ PDF Downloaded!'));
+}
+
+function clearAll() {
+  if (!confirm('Reset all fields?')) return;
+  document.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+  document.getElementById('edu-entries').innerHTML = '';
+  document.getElementById('exp-entries').innerHTML = '';
+  skills = []; langs = [];
+  renderSkillTags(); renderLangTags();
+  eduCount = 0; expCount = 0;
+  update();
+  showToast('✅ Form cleared!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Init
+update();
+</script>
+</body>
+</html>
